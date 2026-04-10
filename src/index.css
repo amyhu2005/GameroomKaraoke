@@ -1,0 +1,268 @@
+/* Global design system */
+:root {
+  --color-bg: #1e1b3a; /* deep navy */
+  --color-card-bg: rgba(255, 255, 255, 0.06);
+  --color-card-border: rgba(255, 255, 255, 0.15);
+  --color-open: #ffffff; /* white when empty */
+  --color-occupied: #f5c761; /* gold when used */
+  --color-broken: #2c2c2c; /* dark grey when broken */
+  --color-gold: #f5c761; /* accent */
+  --font-primary: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+  background: var(--color-bg);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Fancy card enhancements */
+.card {
+  background: var(--color-card-bg);
+  backdrop-filter: blur(20px) saturate(200%);
+  border: 1px solid var(--color-card-border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.6);
+}
+
+/* Status specific backgrounds */
+.card.open {
+  background-color: var(--color-open);
+  color: #000;
+}
+
+.card.occupied {
+  background-color: var(--color-occupied);
+  color: #000;
+}
+
+.card.broken {
+  background-color: var(--color-broken);
+  color: #fff;
+}
+
+.room-grid {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.room {
+  flex: 1;
+  min-width: 180px;
+  cursor: pointer;
+}
+
+.room-status {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+h1, h2 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+}
+
+
+.timer {
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+.waitlist-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; /* Increased spacing */
+}
+
+.waitlist-form {
+  display: flex;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-card-border);
+}
+
+.wait-time-bar {
+  background: var(--color-gold);
+  color: #000;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(245, 199, 97, 0.3);
+}
+
+.waitlist-item {
+  padding: 1.2rem 0; /* More padding */
+  border-bottom: 1px solid var(--color-card-border);
+  transition: all 0.4s ease;
+}
+
+/* Glowing notification for guests within 5 mins */
+.ready-glow {
+  background: rgba(245, 199, 97, 0.15);
+  box-shadow: inset 0 0 20px rgba(245, 199, 97, 0.2);
+  border-radius: 12px;
+  padding: 1.2rem;
+  animation: glow-pulse 2s infinite alternate;
+}
+
+@keyframes glow-pulse {
+  from { box-shadow: inset 0 0 10px rgba(245, 199, 97, 0.1); }
+  to { box-shadow: inset 0 0 30px rgba(245, 199, 97, 0.4); }
+}
+
+.message-note {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.closed-message {
+  background: var(--color-broken);
+  color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #ff4444;
+}
+
+.button {
+  background: var(--color-gold);
+  border: none;
+  color: #000;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.button:hover {
+  background: #d4ac0d;
+}
+
+/* Construction icon button */
+.construction-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #fff;
+  z-index: 10;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.construction-icon:hover {
+  background: var(--color-card-border);
+  transform: scale(1.1);
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  padding-bottom: 5rem;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-gold), transparent);
+  width: 80%;
+  margin: 0 auto;
+  opacity: 0.3;
+}
+
+.waitlist-card {
+  margin-top: 2rem;
+  text-align: left !important;
+}
+
+.waitlist-card h3 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  border-bottom: 1px solid var(--color-card-border);
+  padding-bottom: 0.5rem;
+}
+.action-cell {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.assignment-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.room-select {
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card-bg);
+  color: #fff;
+  cursor: pointer;
+}
+
+.room-select option {
+  background: var(--color-bg);
+  color: #fff;
+}
+
+.confirm-btn {
+  background: #27ae60 !important; /* Green for confirm */
+  color: #fff !important;
+}
+
+.confirm-btn:disabled {
+  background: #555 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cancel-btn {
+  background: #c0392b !important; /* Red for cancel */
+  color: #fff !important;
+  min-width: 32px;
+}
