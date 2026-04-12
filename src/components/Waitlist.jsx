@@ -190,7 +190,7 @@ export default function Waitlist({ waitlist, addToWaitlist, removeFromWaitlist, 
                         }
                       }}
                     >
-                      🗑️
+                      Delete
                     </button>
                   </>
                 )}

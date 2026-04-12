@@ -175,20 +175,17 @@ h1, h2 {
 }
 
 .delete-btn {
-  background: transparent !important;
-  color: #ff4d4d !important;
-  border: 1px solid transparent !important;
-  font-size: 1rem;
-  padding: 0.3rem 0.5rem;
-  opacity: 0.6;
-  filter: grayscale(1);
+  background: #c0392b !important; /* Solid red */
+  color: #fff !important;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  transition: background 0.2s, transform 0.2s;
 }
 
 .delete-btn:hover {
-  opacity: 1;
-  filter: grayscale(0);
-  background: rgba(192, 57, 43, 0.1) !important;
-  border-color: rgba(192, 57, 43, 0.2) !important;
+  background: #e74c3c !important; /* Lighter red on hover */
+  transform: scale(1.05);
 }
 
 /* Construction icon button */
