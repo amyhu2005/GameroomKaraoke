@@ -6,9 +6,10 @@ export default function Waitlist({ waitlist, addToWaitlist, removeFromWaitlist, 
   const [checkingInId, setCheckingInId] = useState(null);
   const [selectedRoomId, setSelectedRoomId] = useState('');
 
-  // CLOSING TIME CONFIG: 11:00 PM
-  const CLOSING_HOUR = 23; 
-  const CLOSING_MINUTE = 0;
+  // Determine closing time based on day of week
+  const day = new Date().getDay();
+  const isLateClosing = (day === 5 || day === 6); // Fri (5) or Sat (6)
+  const CLOSING_TEXT = isLateClosing ? '12:00 AM' : '11:00 PM';
 
   // SIMULATION LOGIC: Calculate entry times for the whole waitlist
   const simulatedGuests = useMemo(() => {
@@ -75,7 +76,15 @@ export default function Waitlist({ waitlist, addToWaitlist, removeFromWaitlist, 
     if (waitSeconds === Infinity) return false;
     const entryDate = new Date(Date.now() + waitSeconds * 1000);
     const closingDate = new Date();
-    closingDate.setHours(CLOSING_HOUR, CLOSING_MINUTE, 0, 0);
+    
+    if (isLateClosing) {
+      // Midnight at end of day (start of tomorrow)
+      closingDate.setDate(closingDate.getDate() + 1);
+      closingDate.setHours(0, 0, 0, 0);
+    } else {
+      // 11:00 PM
+      closingDate.setHours(23, 0, 0, 0);
+    }
     return entryDate >= closingDate;
   };
 
@@ -90,7 +99,7 @@ export default function Waitlist({ waitlist, addToWaitlist, removeFromWaitlist, 
 
       {waitlistClosed ? (
         <div className="closed-message">
-          ⚠️ Waitlist is done for the day. (Estimated entry past 11:00 PM)
+          ⚠️ Waitlist is done for the day. (Estimated entry past {CLOSING_TEXT})
         </div>
       ) : (
         <form className="waitlist-form" onSubmit={handleAdd}>
