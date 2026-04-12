@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-export default function Waitlist({ waitlist, addToWaitlist, messageGuest, assignGuestToRoom, rooms, sessionDuration }) {
+export default function Waitlist({ waitlist, addToWaitlist, removeFromWaitlist, messageGuest, assignGuestToRoom, rooms, sessionDuration }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [checkingInId, setCheckingInId] = useState(null);
@@ -10,11 +10,49 @@ export default function Waitlist({ waitlist, addToWaitlist, messageGuest, assign
   const CLOSING_HOUR = 23; 
   const CLOSING_MINUTE = 0;
 
-  // Calculate earliest remaining time among occupied rooms (in seconds)
-  const earliestRemaining = useMemo(() => {
-    const occupied = rooms.filter((r) => r.status === 'occupied');
-    if (occupied.length === 0) return 0;
-    return Math.min(...occupied.map((r) => r.remaining));
+  // SIMULATION LOGIC: Calculate entry times for the whole waitlist
+  const simulatedGuests = useMemo(() => {
+    // 1. Get functional rooms and their current "release" times
+    let releaseTimes = rooms
+      .filter((r) => r.status !== 'broken')
+      .map((r) => (r.status === 'open' ? 0 : r.remaining));
+
+    if (releaseTimes.length === 0) return waitlist.map(g => ({ ...g, entryWait: Infinity }));
+
+    // 2. Simulate placing each guest into the earliest available slot
+    return waitlist.map((guest) => {
+      releaseTimes.sort((a, b) => a - b);
+      const entryWait = releaseTimes[0];
+      // Update that room's next release time
+      releaseTimes[0] = entryWait + sessionDuration;
+      return { ...guest, entryWait };
+    });
+  }, [waitlist, rooms, sessionDuration]);
+
+  // Next guest's wait time (for the input form / top bar)
+  const nextGuestWait = useMemo(() => {
+    let releaseTimes = rooms
+      .filter((r) => r.status !== 'broken')
+      .map((r) => (r.status === 'open' ? 0 : r.remaining));
+    
+    if (releaseTimes.length === 0) return 0;
+
+    // Simulate placing all current guests first
+    waitlist.forEach(() => {
+      releaseTimes.sort((a, b) => a - b);
+      releaseTimes[0] += sessionDuration;
+    });
+
+    releaseTimes.sort((a, b) => a - b);
+    return releaseTimes[0];
+  }, [waitlist, rooms, sessionDuration]);
+
+  // Display value for "Current wait time"
+  const earliestAvailable = useMemo(() => {
+    const functional = rooms.filter(r => r.status !== 'broken');
+    if (functional.length === 0) return 0;
+    const releaseTimes = functional.map(r => r.status === 'open' ? 0 : r.remaining);
+    return Math.min(...releaseTimes);
   }, [rooms]);
 
   const handleAdd = (e) => {
@@ -27,32 +65,27 @@ export default function Waitlist({ waitlist, addToWaitlist, messageGuest, assign
   };
 
   const formatEntryTime = (waitSeconds) => {
+    if (waitSeconds === 0) return 'Now';
+    if (waitSeconds === Infinity) return 'N/A';
     const entryDate = new Date(Date.now() + waitSeconds * 1000);
     return entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getEntryDate = (waitSeconds) => {
-    return new Date(Date.now() + waitSeconds * 1000);
-  };
-
   const isPastClosing = (waitSeconds) => {
-    const entryDate = getEntryDate(waitSeconds);
+    if (waitSeconds === Infinity) return false;
+    const entryDate = new Date(Date.now() + waitSeconds * 1000);
     const closingDate = new Date();
     closingDate.setHours(CLOSING_HOUR, CLOSING_MINUTE, 0, 0);
     return entryDate >= closingDate;
   };
 
+  const waitlistClosed = isPastClosing(nextGuestWait);
   const openRooms = rooms.filter(r => r.status === 'open');
-  const nextWaitSeconds = waitlist.length > 0 
-    ? earliestRemaining + waitlist.length * sessionDuration
-    : earliestRemaining;
-
-  const waitlistClosed = isPastClosing(nextWaitSeconds);
 
   return (
     <div className="waitlist-inner">
       <div className="wait-time-bar">
-        Wait time: {formatEntryTime(earliestRemaining)}
+        Next available: {formatEntryTime(earliestAvailable)}
       </div>
 
       {waitlistClosed ? (
@@ -75,10 +108,9 @@ export default function Waitlist({ waitlist, addToWaitlist, messageGuest, assign
           <span style={{ flex: 2 }}>Actions</span>
         </div>
         
-        {waitlist.map((guest, index) => {
-          const waitSeconds = earliestRemaining + index * sessionDuration;
+        {simulatedGuests.map((guest) => {
           const isCheckingIn = checkingInId === guest.id;
-          const isUrgent = waitSeconds < 300; // 5 mins
+          const isUrgent = guest.entryWait < 300; // 5 mins
 
           return (
             <div key={guest.id} className={`waitlist-item ${isUrgent ? 'ready-glow' : ''}`} style={{ display: 'flex', alignItems: 'center' }}>
@@ -88,7 +120,11 @@ export default function Waitlist({ waitlist, addToWaitlist, messageGuest, assign
                 {isUrgent && <span className="message-note">⚠️ MESSAGE THEM!</span>}
               </div>
               <span style={{ flex: 1 }}>{guest.elapsed}s</span>
-              <span style={{ flex: 1 }}>{formatEntryTime(waitSeconds)}</span>
+              <span style={{ flex: 1 }}>
+                <span className={guest.entryWait === 0 ? 'text-now' : ''}>
+                  {formatEntryTime(guest.entryWait)}
+                </span>
+              </span>
               
               <span style={{ flex: 2 }} className="action-cell">
                 {isCheckingIn ? (
@@ -135,6 +171,17 @@ export default function Waitlist({ waitlist, addToWaitlist, messageGuest, assign
                       }}
                     >
                       Check‑in
+                    </button>
+                    <button 
+                      className="button delete-btn" 
+                      title="Remove from waitlist"
+                      onClick={() => {
+                        if (confirm(`Remove ${guest.name} from waitlist?`)) {
+                          removeFromWaitlist(guest.id);
+                        }
+                      }}
+                    >
+                      🗑️
                     </button>
                   </>
                 )}

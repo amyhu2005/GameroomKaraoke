@@ -94,6 +94,10 @@ export default function Tracker({ title, initialItems, sessionDuration }) {
     setWaitlist((prev) => prev.filter((w) => w.id !== guestId));
   };
 
+  const removeFromWaitlist = (id) => {
+    setWaitlist((prev) => prev.filter((w) => w.id !== id));
+  };
+
   return (
     <div className="tracker-section container">
       <h1 className="section-title">{title}</h1>
@@ -103,6 +107,7 @@ export default function Tracker({ title, initialItems, sessionDuration }) {
         <Waitlist
           waitlist={waitlist}
           addToWaitlist={addToWaitlist}
+          removeFromWaitlist={removeFromWaitlist}
           messageGuest={messageGuest}
           assignGuestToRoom={assignGuestToRoom}
           rooms={items}

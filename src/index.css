@@ -143,6 +143,13 @@ h1, h2 {
   margin-top: 4px;
 }
 
+.text-now {
+  color: #27ae60; /* Green for 'Now' */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .closed-message {
   background: var(--color-broken);
   color: #fff;
@@ -165,6 +172,23 @@ h1, h2 {
 
 .button:hover {
   background: #d4ac0d;
+}
+
+.delete-btn {
+  background: transparent !important;
+  color: #ff4d4d !important;
+  border: 1px solid transparent !important;
+  font-size: 1rem;
+  padding: 0.3rem 0.5rem;
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  filter: grayscale(0);
+  background: rgba(192, 57, 43, 0.1) !important;
+  border-color: rgba(192, 57, 43, 0.2) !important;
 }
 
 /* Construction icon button */
