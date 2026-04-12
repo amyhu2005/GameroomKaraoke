@@ -85,7 +85,7 @@ export default function Waitlist({ waitlist, addToWaitlist, removeFromWaitlist, 
   return (
     <div className="waitlist-inner">
       <div className="wait-time-bar">
-        Next available: {formatEntryTime(earliestAvailable)}
+        Estimated entry for next guest: {formatEntryTime(nextGuestWait)}
       </div>
 
       {waitlistClosed ? (
